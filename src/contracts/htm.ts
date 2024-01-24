@@ -42,16 +42,22 @@ export class HashToMintBsv20 extends BSV20V2 {
         this.currentReward = currentReward
         this.totalSupply = max
         this.startingDifficulty = difficulty
+        this.maxDifficulty = BigInt(15)
 
         assert(max % 5n === 0n, 'Supply must be divisible by 5')
-        assert(difficulty < 10, 'Max difficulty is 9')
+        assert(difficulty < this.maxDifficulty, 'Max difficulty is 15')
     }
 
     @method(SigHash.ANYONECANPAY_ALL)
     public redeem(rewardPkh: PubKeyHash, nonce: ByteString) {
         const hash = sha256(this.ctx.utxo.outpoint.txid + nonce)
-        for (let i = 0; i < Number(this.calculateDifficulty()); i++) {
-            assert(hash[i] === '0', `Difficulty not met`)
+        const calculatedDifficulty = this.calculateDifficulty()
+
+        const MAX_DIFFICULTY = 10
+        for (let i = 0; i < MAX_DIFFICULTY; i++) {
+            if (i < calculatedDifficulty) {
+                assert(hash[i] === '0', `Difficulty not met at position ${i}`)
+            }
         }
         assert(this.ctx.sequence < 0xffffffff, `must use sequence < 0xffffffff`)
         const supply = this.supply - this.currentReward

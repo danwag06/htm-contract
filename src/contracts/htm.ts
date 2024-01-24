@@ -13,6 +13,7 @@ import {
     SigHash,
     toByteString,
     Utils,
+    slice,
 } from 'scrypt-ts'
 
 export class HashToMintBsv20 extends BSV20V2 {
@@ -53,10 +54,14 @@ export class HashToMintBsv20 extends BSV20V2 {
         const hash = sha256(this.ctx.utxo.outpoint.txid + nonce)
         const calculatedDifficulty = this.calculateDifficulty()
 
-        const MAX_DIFFICULTY = 10
+        const MAX_DIFFICULTY = 15
         for (let i = 0; i < MAX_DIFFICULTY; i++) {
             if (i < calculatedDifficulty) {
-                assert(hash[i] === '0', `Difficulty not met at position ${i}`)
+                assert(
+                    slice(hash, BigInt(i), BigInt(i + 1)) ===
+                        toByteString('00'),
+                    `Difficulty not met at position ${i}`
+                )
             }
         }
         assert(this.ctx.sequence < 0xffffffff, `must use sequence < 0xffffffff`)

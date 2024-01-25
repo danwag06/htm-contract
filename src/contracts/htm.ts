@@ -29,6 +29,9 @@ export class HashToMintBsv20 extends BSV20V2 {
     @prop()
     readonly startingDifficulty: bigint
 
+    @prop()
+    readonly maxDifficulty: bigint
+
     constructor(
         sym: ByteString,
         max: bigint,
@@ -43,6 +46,7 @@ export class HashToMintBsv20 extends BSV20V2 {
         this.currentReward = currentReward
         this.totalSupply = max
         this.startingDifficulty = difficulty
+        this.maxDifficulty = 15n
 
         assert(max % 5n === 0n, 'Supply must be divisible by 5')
         assert(difficulty < this.maxDifficulty, 'Max difficulty is 15')

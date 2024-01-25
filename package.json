@@ -21,9 +21,6 @@
   "lint-staged": {
     "**/*": [
       "prettier --write --ignore-unknown"
-    ],
-    "**/*.{ts,js}": [
-      "eslint --cache --fix"
     ]
   },
   "dependencies": {

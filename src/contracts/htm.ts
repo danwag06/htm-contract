@@ -49,7 +49,7 @@ export class HashToMintBsv20 extends BSV20V2 {
         this.maxDifficulty = 15n
 
         assert(max % 5n === 0n, 'Supply must be divisible by 5')
-        assert(difficulty < this.maxDifficulty, 'Max difficulty is 15')
+        assert(difficulty < 15, 'Max difficulty is 15')
     }
 
     @method(SigHash.ANYONECANPAY_ALL)

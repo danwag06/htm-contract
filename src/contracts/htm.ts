@@ -127,7 +127,7 @@ export class HashToMintBsv20 extends BSV20V2 {
         }
 
         const tx = new bsv.Transaction().addInput(current.buildContractInput())
-        tx.inputs[0].sequenceNumber = options.sequence!
+        tx.inputs[0].sequenceNumber = options.sequence
 
         if (next.supply > 0n) {
             const stateScript =

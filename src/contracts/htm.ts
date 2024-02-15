@@ -1,8 +1,10 @@
 import { BSV20V2, Ordinal } from 'scrypt-ord'
 import {
+    and,
     assert,
     bsv,
     ByteString,
+    byteString2Int,
     ContractTransaction,
     hash256,
     method,
@@ -11,9 +13,9 @@ import {
     PubKeyHash,
     sha256,
     SigHash,
+    slice,
     toByteString,
     Utils,
-    slice,
 } from 'scrypt-ts'
 
 export class HashToMintBsv20 extends BSV20V2 {
@@ -54,14 +56,18 @@ export class HashToMintBsv20 extends BSV20V2 {
 
     @method(SigHash.ANYONECANPAY_ALL)
     public redeem(rewardPkh: PubKeyHash, nonce: ByteString) {
-        const hash = sha256(this.ctx.utxo.outpoint.txid + nonce)
+        const hash = sha256(sha256(this.ctx.utxo.outpoint.txid + nonce))
         const calculatedDifficulty = this.calculateDifficulty()
         const MAX_DIFFICULTY = 15
         for (let i = 0; i < MAX_DIFFICULTY; i++) {
+            const mask = BigInt(i % 2 === 0 ? 0xf0 : 0x0f)
             if (i < calculatedDifficulty) {
+                const sliceStart = BigInt(i) / BigInt(2)
+                const sliceEnd = sliceStart + BigInt(1)
+                const byte = slice(hash, sliceStart, sliceEnd)
+                const slicedHash = and(byteString2Int(byte), mask)
                 assert(
-                    slice(hash, BigInt(i), BigInt(i + 1)) ===
-                        toByteString('00'),
+                    slicedHash === BigInt(0),
                     `Difficulty not met at position ${i}`
                 )
             }
